@@ -11,16 +11,14 @@ Bla bla bla
 st.header("How are countries controlling Tobacco consumption?")
 
 '''
-The following analysis is based on the evaluation made by World Health Organization (WHO) to country policies against Tobacco. A score from 1 to 5 is assigned depending on the intensity of a country to deal with Tobacco issues being 1 the worst and 5 the best
+The following analysis is based on the evaluation made by World Health Organization (WHO) 
+to country policies against Tobacco. A score from 1 to 5 is assigned depending on the intensity 
+of a country to deal with Tobacco issues being 1 the worst and 5 the best
 '''
 
 
 with st.echo():
-	dataset = 'https://cdn.jsdelivr.net/npm/vega-datasets@1/data/cars.json'
-	movies = 'https://cdn.jsdelivr.net/npm/vega-datasets@1/data/movies.json'
-	sp500 = 'https://cdn.jsdelivr.net/npm/vega-datasets@1/data/sp500.csv'
-	stocks = 'https://cdn.jsdelivr.net/npm/vega-datasets@1/data/stocks.csv'
-	flights = 'https://cdn.jsdelivr.net/npm/vega-datasets@1/data/flights-5k.json'
+	control_dataset = 'https://github.com/JulioCandela1993/VisualAnalytics/blob/master/control_policy.csv'
 
 st.header("Introducing Selections")
 

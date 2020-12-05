@@ -17,7 +17,7 @@ of a country to deal with Tobacco issues being 1 the worst and 5 the best
 '''
 
 
-control_dataset = 'https://raw.githubusercontent.com/JulioCandela1993/VisualAnalytics/master/control_policy.csv'
+control_dataset = 'https://raw.githubusercontent.com/JulioCandela1993/VisualAnalytics/master/data/control_policy.csv'
 
 st.header("Intensity of controls per country")
 

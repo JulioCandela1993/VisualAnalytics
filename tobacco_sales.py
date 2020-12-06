@@ -1,7 +1,7 @@
 import altair as alt
 import streamlit as st
 import pandas as pd
-
+import numpy as np
 
 sales_data = pd.read_csv('data/sales-of-cigarettes-per-adult-per-day.csv',
                     header=0,
@@ -16,24 +16,26 @@ sales_data = pd.read_csv('data/sales-of-cigarettes-per-adult-per-day.csv',
                             'Year': 'Int64',
                             'NumCig': 'float64'})
 
-
-sales_bycountry = st.multiselect('Country',
-                           sales_data.groupby('Country').count().reset_index()['Country'].tolist())
 sales_minyear = sales_data.loc[:, 'Year'].min()
 sales_maxyear = sales_data.loc[:, 'Year'].max()
 
-sales_slidermin = alt.binding_range(min=sales_minyear, max=sales_maxyear, name='Year')
-sales_slidermax = alt.binding_range(min=sales_minyear, max=sales_maxyear, name='Year')
-sales_selector = alt.selection_single(name='Year', bind=sales_slidermax, fields=['Year'])
+container = st.beta_container()
+with container:
+    sales_bycountry = st.multiselect('Select countries to plot',
+                           sales_data.groupby('Country').count().reset_index()['Country'].tolist(),
+                           default=['France', 'Germany', 'Spain'])
 
-sales_chart = alt.Chart(sales_data).mark_line().encode(
-    alt.X('Year'),
-    alt.Y('NumCig'),
-    alt.Color('Country')
+
+slider = st.slider('Select a period to plot', int(str(sales_minyear)), int(str(sales_maxyear)), (1980, 2000))
+sales_chart = alt.Chart(sales_data, height=500, width=700,
+title='Average number of cigarettes sold daily during chosen period of time').mark_line().encode(
+alt.X('Year', axis=alt.Axis(title='Years', tickCount=5)),
+alt.Y('NumCig', axis=alt.Axis(title='Avg daily sales of cigarretes')),
+alt.Color('Country')
 ).transform_filter(
-    {"field": "Country", "oneOf": sales_bycountry}
-    ).add_selection(sales_selector).interactive()
-# {"field": "Country", "oneOf": sales_bycountry}, 
-#{"and": [{"field": "Year", "oneOf": [sales_selector.Year]}]}
-print(type(sales_selector.Year))
-st.altair_chart(sales_chart)
+    {'and': [{'field': 'Country', 'oneOf': sales_bycountry},
+            {'field': 'Year', 'range': slider}]}
+    )
+with container:
+
+    st.altair_chart(sales_chart)

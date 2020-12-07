@@ -21,6 +21,11 @@ sales_maxyear = sales_data.loc[:, 'Year'].max()
 
 container = st.beta_container()
 with container:
+    st.header('Tobacco sales trend in different countries')
+    '''
+    This chart below shows average number of cigarettes sold per day in a particular country.
+    For example, in 1980 in France, people used to buy on average 6 cigarettes per day.
+    '''
     sales_bycountry = st.multiselect('Select countries to plot',
                            sales_data.groupby('Country').count().reset_index()['Country'].tolist(),
                            default=['France', 'Germany', 'Spain'])

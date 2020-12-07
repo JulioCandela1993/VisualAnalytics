@@ -2,6 +2,15 @@ import altair as alt
 import streamlit as st
 import pandas as pd
 
+
+st.header("Smoking Deaths from 1990 to 2017")
+
+'''
+The following analysis is based on the evaluation made by World Health Organization (WHO) 
+to country policies against Tobacco. A score from 1 to 5 is assigned depending on the intensity 
+of a country to deal with Tobacco issues being 1 the worst and 5 the best
+'''
+
 deaths = pd.read_csv('data/smoking-deaths-by-age.csv',
                     header=0,
                     names=[
@@ -149,7 +158,7 @@ bar_factors = alt.Chart(factors).mark_bar().add_selection(
       alt.value("lightgray")  # Other than smoking
     )
 ).properties(
-    width=250,
+    width=150,
     height=450
 )
 
@@ -160,7 +169,7 @@ st.altair_chart(alt.hconcat(alt.vconcat(base,years)
                                             fillColor='#EEEEEE',
                                             padding=5,
                                             cornerRadius=10)
-                            .properties(spacing=20, autosize="pad", title='Smoking contribution to deaths from 1990 to 2017')
+                            .properties(spacing=20, autosize="pad")
                             .configure_title(
                                             align="center",
                                             fontSize=20,

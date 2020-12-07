@@ -130,7 +130,8 @@ of citizen's life.
 
 As a consequence, we have developed the next visualization to measure the efficiency of each change in control policies with 
 respect to the change in deaths because of Smoking. We consider "change" as the percentage of variation
-between 2008 and 2016. 
+between 2008 and 2016. The user can also select brush the histograms in order to filter the points and 
+evaluate the slope of the regression in more detail (with groups that increased more or less the efforts in control policies, for example)
 
 An increase in the efforts of a control policy should be reflected in a decrease in the number of deaths as part of 
 the efficiency of the control measure

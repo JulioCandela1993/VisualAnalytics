@@ -9,18 +9,18 @@ from altair import datum
 import matplotlib.pyplot as plt
 from io import BytesIO
 
-####### Datasets
-
-control_dataset = 'https://raw.githubusercontent.com/JulioCandela1993/VisualAnalytics/master/data/control_policy.csv'
-deaths_dataset = 'https://raw.githubusercontent.com/JulioCandela1993/VisualAnalytics/master/data/deaths.csv'
-
-
-####### Dataframes
-
-control_df = pd.read_csv(control_dataset)
-
-
 def app():
+
+    ####### Datasets
+    
+    control_dataset = 'https://raw.githubusercontent.com/JulioCandela1993/VisualAnalytics/master/data/control_policy.csv'
+    deaths_dataset = 'https://raw.githubusercontent.com/JulioCandela1993/VisualAnalytics/master/data/deaths.csv'
+    
+    
+    ####### Dataframes
+    
+    control_df = pd.read_csv(control_dataset)
+    
     
     ####### Dashboard
     
@@ -319,7 +319,7 @@ def app():
             ).configure_title(align = "center", anchor = "middle", dy = -10))
 
 
-
+##app()
    
   
     

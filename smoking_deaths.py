@@ -2,176 +2,193 @@ import altair as alt
 import streamlit as st
 import pandas as pd
 
+def app():
+    ##########################################################
+    #############       smoking_deaths.py        #############
+    ##########################################################
+    st.title("Tobacco: a silent killer")
+    # st.header("")
+    
+    @st.cache(allow_output_mutation=True)
+    def load_data():
+        deaths = pd.read_csv('data/smoking-deaths-by-age.csv',
+                            header=0,
+                            names=[
+                                'country',
+                                'code',
+                                'year',
+                                '15 to 49',
+                                '50 to 69',
+                                'Above 70'])
+        factors = pd.read_csv('data/number-of-deaths-by-risk-factor.csv',
+                            header=0,
+                            index_col=False,
+                            names=[
+                                'country',
+                                'code',
+                                'year',
+                                'Diet low in vegetables',
+                                'Diet low in whole grains',
+                                'Diet low in nuts and seeds',
+                                'Diet low in calcium',
+                                'Unsafe sex',
+                                'No access to handwashing facility',
+                                'Child wasting',
+                                'Child stunting',
+                                'Diet high in red meat',
+                                'Diet low in fiber',
+                                'Diet low in seafood omega-3 fatty acids',
+                                'Diet high in sodium',
+                                'Low physical activity',
+                                'Non-exclusive breastfeeding',
+                                'Discontinued breastfeeding',
+                                'Iron deficiency',
+                                'Vitamin A deficiency',
+                                'Zinc deficiency',
+                                'Smoking',
+                                'Secondhand smoke',
+                                'Alcohol use',
+                                'Drug use',
+                                'High fasting plasma glucose',
+                                'High total cholesterol', # Many null values
+                                'High systolic blood pressure',
+                                'High body-mass index',
+                                'Low bone mineral density',
+                                'Diet low in fruits',
+                                'Diet low in legumes',
+                                'Low birth weight for gestation',
+                                'Unsafe water source',
+                                'Unsafe sanitation',
+                                'Household air pollution from solid fuels',
+                                'Air pollution',
+                                'Outdoor air pollution'])
 
-st.header("Smoking Deaths from 1990 to 2017")
+        # Convert data from wide to long
+        deaths = pd.melt(deaths, id_vars=['country', 'year'], value_vars=['15 to 49', '50 to 69', 'Above 70'], var_name='Age')
+        factors = pd.melt(factors, id_vars=['country', 'year'], value_vars=['Diet low in vegetables',
+                                'Diet low in nuts and seeds',
+                                'Diet low in calcium',
+                                'Unsafe sex',
+                                'No access to handwashing facility',
+                                'Child wasting',
+                                'Child stunting',
+                                'Diet high in red meat',
+                                'Diet low in fiber',
+                                'Diet low in seafood omega-3 fatty acids',
+                                'Diet high in sodium',
+                                'Low physical activity',
+                                'Non-exclusive breastfeeding',
+                                'Discontinued breastfeeding',
+                                'Iron deficiency',
+                                'Vitamin A deficiency',
+                                'Zinc deficiency',
+                                'Smoking',
+                                'Secondhand smoke',
+                                'Alcohol use',
+                                'Drug use',
+                                'High fasting plasma glucose',
+                                'High total cholesterol', # Many null values
+                                'High systolic blood pressure',
+                                'High body-mass index',
+                                'Low bone mineral density',
+                                'Diet low in fruits',
+                                'Diet low in legumes',
+                                'Low birth weight for gestation',
+                                'Unsafe water source',
+                                'Unsafe sanitation',
+                                'Household air pollution from solid fuels',
+                                'Air pollution',
+                                'Outdoor air pollution'], var_name='risk_factor')
 
-'''
-The following analysis is based on the evaluation made by World Health Organization (WHO) 
-to country policies against Tobacco. A score from 1 to 5 is assigned depending on the intensity 
-of a country to deal with Tobacco issues being 1 the worst and 5 the best
-'''
+        countries = deaths['country'].unique() # get unique country names
+        countries.sort() # sort alphabetically
+        minyear = deaths.loc[:, 'year'].min()
+        maxyear = deaths.loc[:, 'year'].max()
+        return deaths, factors, countries, minyear, maxyear
 
-deaths = pd.read_csv('data/smoking-deaths-by-age.csv',
-                    header=0,
-                    names=[
-                        'country',
-                        'code',
-                        'year',
-                        '15 to 49',
-                        '50 to 69',
-                        'Above 70'])
-factors = pd.read_csv('data/number-of-deaths-by-risk-factor.csv',
-                    header=0,
-                    index_col=False,
-                    names=[
-                        'country',
-                        'code',
-                        'year',
-                        'Diet low in vegetables',
-                        'Diet low in whole grains',
-                        'Diet low in nuts and seeds',
-                        'Diet low in calcium',
-                        'Unsafe sex',
-                        'No access to handwashing facility',
-                        'Child wasting',
-                        'Child stunting',
-                        'Diet high in red meat',
-                        'Diet low in fiber',
-                        'Diet low in seafood omega-3 fatty acids',
-                        'Diet high in sodium',
-                        'Low physical activity',
-                        'Non-exclusive breastfeeding',
-                        'Discontinued breastfeeding',
-                        'Iron deficiency',
-                        'Vitamin A deficiency',
-                        'Zinc deficiency',
-                        'Smoking',
-                        'Secondhand smoke',
-                        'Alcohol use',
-                        'Drug use',
-                        'High fasting plasma glucose',
-                        'High total cholesterol', # Many null values
-                        'High systolic blood pressure',
-                        'High body-mass index',
-                        'Low bone mineral density',
-                        'Diet low in fruits',
-                        'Diet low in legumes',
-                        'Low birth weight for gestation',
-                        'Unsafe water source',
-                        'Unsafe sanitation',
-                        'Household air pollution from solid fuels',
-                        'Air pollution',
-                        'Outdoor air pollution'])
+    deaths, factors, countries, minyear, maxyear = load_data()
 
-# Convert data from wide to long
-deaths = pd.melt(deaths, id_vars=['country', 'year'], value_vars=['15 to 49', '50 to 69', 'Above 70'], var_name='Age')
-factors = pd.melt(factors, id_vars=['country', 'year'], value_vars=['Diet low in vegetables',
-                        'Diet low in nuts and seeds',
-                        'Diet low in calcium',
-                        'Unsafe sex',
-                        'No access to handwashing facility',
-                        'Child wasting',
-                        'Child stunting',
-                        'Diet high in red meat',
-                        'Diet low in fiber',
-                        'Diet low in seafood omega-3 fatty acids',
-                        'Diet high in sodium',
-                        'Low physical activity',
-                        'Non-exclusive breastfeeding',
-                        'Discontinued breastfeeding',
-                        'Iron deficiency',
-                        'Vitamin A deficiency',
-                        'Zinc deficiency',
-                        'Smoking',
-                        'Secondhand smoke',
-                        'Alcohol use',
-                        'Drug use',
-                        'High fasting plasma glucose',
-                        'High total cholesterol', # Many null values
-                        'High systolic blood pressure',
-                        'High body-mass index',
-                        'Low bone mineral density',
-                        'Diet low in fruits',
-                        'Diet low in legumes',
-                        'Low birth weight for gestation',
-                        'Unsafe water source',
-                        'Unsafe sanitation',
-                        'Household air pollution from solid fuels',
-                        'Air pollution',
-                        'Outdoor air pollution'], var_name='Risk Factor')
+    # Country Selection
+    selectCountry = st.selectbox('Select a country: ', countries, 73)
 
-# Country Selection
-countries = deaths['country'].unique() # get unique country names
-countries.sort() # sort alphabetically
-selectCountry = alt.selection_single(
-    name='Select', # name the selection 'Select'
-    fields=['country'], # limit selection to the country field
-    init={'country': countries[0]}, # use first country entry as initial value
-    bind=alt.binding_select(options=countries) # bind to a menu of unique country values
-)
 
-# Year selection
-brush = alt.selection_interval(encodings=['x'])
-years = alt.Chart(deaths).mark_line().add_selection(
-    brush
-).transform_filter(
-    selectCountry
-).encode(
-    alt.X('year:O', title='Year'),
-    alt.Y('sum(value)', title='Smoking Deaths (all ages)')
-).properties(
-    height=100
-)
+    # Year selection
+    slider = st.slider('Select a period of time', int(str(minyear)), int(str(maxyear)), (1990, 2017))
 
-# Area chart - Smoking deaths by ages
-base = alt.Chart(deaths).mark_area().add_selection(
-    selectCountry
-).transform_filter(
-    selectCountry
-).transform_filter(
-    brush
-).encode(
-    alt.X('year:O', title='Year'),
-    y=alt.Y('value:Q', title='Smoking Deaths by Ages (normalized)', stack="normalize"),
-    color=alt.Color('Age:O', scale=alt.Scale(scheme='lightorange')),
-    tooltip='Age:O',
-    text='Age:O'
-).properties(
-    width=550,
-    height=250
-)
+    # brush = alt.selection_interval(encodings=['x'])
+    # years = alt.Chart(deaths).mark_line().add_selection(
+    #     brush
+    # ).transform_filter(
+    #     alt.datum.country == selectCountry
+    # ).encode(
+    #     alt.X('year:O', title='Year'),
+    #     alt.Y('sum(value)', title='Smoking Deaths (all ages)')
+    # ).properties(
+    #     width=600,
+    #     height=150
+    # )
 
-# Bar chart - Risk factors
-bar_factors = alt.Chart(factors).mark_bar().add_selection(
-    selectCountry
-).transform_filter(
-    selectCountry
-).transform_filter(
-    brush
-).encode(
-    alt.X('sum(value):Q', title='Total deaths'),
-    y=alt.Y('Risk Factor:O',sort='-x'),
-    tooltip='sum(value):Q',
-    color=alt.condition(
-      alt.datum['Risk Factor'] == 'Smoking',
-      alt.value("red"),  # Smoking color
-      alt.value("lightgray")  # Other than smoking
+    # Area chart - Smoking deaths by ages
+    base = alt.Chart(deaths, title='Smoking deaths by age').mark_bar().transform_filter(
+        {'and': [{'field': 'country', 'equal': selectCountry},
+                {'field': 'year', 'range': slider}]}
+    ).encode(
+        alt.X('year:O', title='Year'),
+        y=alt.Y('value:Q', title='Number of smoking deaths'),
+        color=alt.Color('Age:O', scale=alt.Scale(scheme='lightorange')),
+        tooltip=alt.Tooltip(["value:Q"],format=",.0f",title="Deaths"),
+        # alt.Tooltip(aggregate='sum', field="value", formatType="number"),
+
+        text='Age:O'
+    ).properties(
+        width=780,
+        height=350
     )
-).properties(
-    width=150,
-    height=450
-)
 
-# Visualize
-st.altair_chart(alt.hconcat(alt.vconcat(base,years)
-                            .properties(spacing=20), bar_factors)
-                            .configure_legend(orient='top-left', strokeColor='gray',
-                                            fillColor='#EEEEEE',
-                                            padding=5,
-                                            cornerRadius=10)
-                            .properties(spacing=20, autosize="pad")
-                            .configure_title(
-                                            align="center",
-                                            fontSize=20,
-                                            font='Arial',
-                                            color='black'))
+    # Bar chart - Risk factors
+    bar_factors = alt.Chart(factors, title='Ranking of the top 20 risk factors').mark_bar().transform_filter(
+        {'and': [{'field': 'country', 'equal': selectCountry},
+                {'field': 'year', 'range': slider}]}
+    ).transform_aggregate(
+        sum_deaths='sum(value)',
+        groupby=["risk_factor"]
+    ).transform_window(
+        rank='rank(sum_deaths)',
+        sort=[alt.SortField('sum_deaths', order='descending')]
+    ).transform_filter(
+        alt.datum.rank < 20
+    ).encode(
+        alt.X('sum_deaths:Q', title='Total deaths over the period of time'),
+        y=alt.Y('risk_factor:O',sort='-x', title='Risk factor'),
+        tooltip=alt.Tooltip(["sum_deaths:Q"],format=",.0f",title="Deaths"),
+        color=alt.condition(
+          alt.datum['risk_factor'] == 'Smoking',
+          alt.value("red"),  # Smoking color
+          alt.value("lightgray")  # Other than smoking
+        )
+    ).properties(
+        width=700,
+        height=350
+    )
+
+    container1 = st.beta_container()
+    with container1:
+        st.altair_chart(base)
+
+    st.markdown("Smoking is a critical factor leading to deaths, especially for old people. The number of people aged over 70 who died because of smoking is extremely high in all countries.")
+    st.markdown("In the bar chart below, we can see how smoking ranks in the list of top 20 risk factors that lead to deaths in the chosen country in the chosen period of time.")
+
+    st.altair_chart(bar_factors)
+    # Visualize
+    # st.altair_chart(alt.hconcat(alt.vconcat(base,years)
+    #                             .properties(spacing=20), bar_factors)
+    #                             .configure_legend(orient='top-left', strokeColor='gray',
+    #                                             fillColor='#EEEEEE',
+    #                                             padding=5,
+    #                                             cornerRadius=10)
+    #                             .properties(spacing=20, autosize="pad")
+    #                             .configure_title(
+    #                                             align="center",
+    #                                             fontSize=20,
+    #                                             font='Arial',
+    #                                             color='black')) 

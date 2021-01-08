@@ -29,11 +29,11 @@ def app():
     
     
     
-    '''
+    st.markdown('''
     The following analysis is based on the evaluation made by World Health Organization (WHO) 
     to country policies against Tobacco. A score from 1 to 5 is assigned depending on the intensity 
     of a country to deal with Tobacco issues being 1 the worst and 5 the best
-    '''
+    ''')
     
     ####### Control Measures given by WHO
     
@@ -65,10 +65,10 @@ def app():
         st.header("How are countries controlling Tobacco consumption?")
         #st.header('"'A global view of the implementation of the policy """ around the world'"')
     
-        '''
+        st.markdown('''
         In the folling map, we can identify the intensity of a specific control policy for each country. 
         We can also see the evolution of these policies from 2008 to 2018
-        '''
+        ''')
         
         select_year = st.slider('Select year: ', 2008, 2018, 2008, step = 2)
     
@@ -140,21 +140,21 @@ def app():
         st.header("Evolution of the policy per country")
         
         
-        '''
+        st.markdown('''
         
         In addition, we can evaluate and compare the evolution of the selected policy among different countries of our interest:
         
-        '''
+        ''')
     
         
         countries = st.multiselect('Select countries to plot',
                                     control_df.groupby('Country').count().reset_index()['Country'].tolist(),
                                     default=['China', 'India', 'France'])
         
-        '''
+        st.markdown('''
         
     
-        ''' 
+        ''') 
         
         xscale_barchart = alt.Scale(domain=(0, 5))
         
@@ -217,25 +217,25 @@ def app():
     
         st.header("Are the policies having an impact in the deaths by Smoking?")
         
-        '''
+        st.markdown('''
         Countries have implemented different control policies against Tobacco which have been measured by WHO from 2008 until 2018. 
         During this period, some countries have strengthen their policies; however, we don't know the real impact of them.
         
         As a consequence, the following visualization measures the correlation of the change in control policies with 
         respect to the change in deaths by Smoking. The definitions of % of change are the following:
             
-        '''    
+        ''')    
         
         render_latex(r'\%\ change\ in\ '+metric_name+r'\ =\ \frac{'+metric_name+r'\ in\ 2016}{'+metric_name+r'\ in\ 2008}')
         
         render_latex(r'\%\ change\ in\ Deaths\ by\ Smoking\ =\ \frac{Deaths\ by\ Smoking\ in\ 2016}{Deaths\ by\ Smoking\ in\ 2008}')
         
-        '''
+        st.markdown('''
         The user can also select brush the histograms in order to filter the points and 
         evaluate the slope of the regression in more detail (with groups that increased more or less in control policies, for example)
         
         
-        '''
+        ''')
     
         brush = alt.selection_interval()
         

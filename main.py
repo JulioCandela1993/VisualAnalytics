@@ -217,7 +217,8 @@ with container:
                            default=['France', 'Germany', 'Spain'])
 
 
-slider = st.slider('Select a period to plot', int(str(sales_minyear)), int(str(sales_maxyear)), (1980, 2000))
+# slider = st.slider('Select a period to plot', int(str(sales_minyear)), int(str(sales_maxyear)), (1980, 2000))
+slider = st.slider('Select a period to plot', 1975, int(str(sales_maxyear)), (1980, 2000))
 sales_chart = alt.Chart(sales_data, height=500, width=700,
 title='Average number of cigarettes sold daily during chosen period of time').mark_line().encode(
 alt.X('Year', axis=alt.Axis(title='Years', tickCount=5)),

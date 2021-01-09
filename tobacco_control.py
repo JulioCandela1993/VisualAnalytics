@@ -24,7 +24,7 @@ def app():
     
     ####### Dashboard
     
-    st.title("Tobacco: a silent killer")
+    st.title("Tobacco Control")
     
     
     

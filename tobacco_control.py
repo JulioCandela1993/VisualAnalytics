@@ -133,7 +133,7 @@ def app():
         
         qualifications = pd.DataFrame.from_dict({
             "keys": [1,2,3,4,5],
-            "category":["1.Very Bad", "2.Bad", "3.Medium", "4.Very Good", "5.Perfect"]
+            "category":["1.Very Bad", "2.Bad", "3.Medium", "4.Good", "5.Perfect"]
             })
         
         

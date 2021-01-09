@@ -1,9 +1,11 @@
+import home
 import smoking_deaths
 import tobacco_sales
 import tobacco_control
 import streamlit as st
 
-PAGES = {  
+PAGES = {
+    "Homepage": home,
     "Tobacco Sales": tobacco_sales,
     "Smoking Deaths": smoking_deaths,
     "Tobacco Control": tobacco_control,

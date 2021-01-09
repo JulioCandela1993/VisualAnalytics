@@ -70,8 +70,9 @@ def app():
         We can also see the evolution of these policies from 2008 to 2018
         ''')
         
-        select_year = st.slider('Select year: ', 2008, 2018, 2008, step = 2)
-    
+        select_year_list = st.selectbox('Select year: ', years)#st.slider('Select year: ', 2008, 2018, 2008, step = 2)
+        select_year = int(select_year_list)
+
         ####### Map Visualization
         
         
@@ -98,10 +99,7 @@ def app():
         ).encode(
             color=alt.Color(metric_to_show_in_covid_Layer, 
                             scale=alt.Scale(range=['#ffe8dd','#ef4f4f']),
-                            legend=alt.Legend(orient='bottom',
-                                              titleOrient = "left",
-                                              type = 'gradient',
-                                              offset = 30)),
+                            legend=None),
             tooltip=[
                 alt.Tooltip("properties.name:O", title="Country"),
                 alt.Tooltip(metric_to_show_in_covid_Layer, title=metric_name),
@@ -130,7 +128,74 @@ def app():
         )
     
     
+            
+        ## Qualification array
+        
+        qualifications = pd.DataFrame.from_dict({
+            "keys": [1,2,3,4,5],
+            "category":["1.Very Bad", "2.Bad", "3.Good", "4.Very Good", "5.Perfect"]
+            })
+        
+        
+            
         st.altair_chart(map_geojson + choro)
+        
+        legend_info = alt.Chart(control_dataset).transform_joinaggregate(
+            num_countries='count(*)',
+        ).transform_filter(
+            alt.FieldEqualPredicate(field='Year', equal=select_year)
+        ).transform_lookup(
+                lookup=metric_name,
+                from_=alt.LookupData(qualifications, "keys", ["category"])
+        ).transform_aggregate(
+            count='count()',
+            groupby=[metric_name,"category"]
+        ).transform_joinaggregate(
+            total='sum(count)'  
+        ).transform_calculate(
+            pct='datum.count / datum.total'  
+        )
+        
+        legend_bar = legend_info.mark_bar().encode(
+                x=alt.X('pct:Q', stack="normalize", sort=alt.SortField(metric_to_show_in_covid_Layer), title = None, axis = None),                
+                color=alt.Color(metric_to_show_in_covid_Layer,
+                            scale=alt.Scale(range=['#ffe8dd','#ef4f4f'])
+                            ,legend = None),
+                tooltip=[
+                    alt.Tooltip(metric_to_show_in_covid_Layer, title=metric_name)
+                ],
+        )
+        
+        legend_value = legend_info.mark_text(dx = -11, align='center', baseline='middle', color='black', fontWeight = "bold").encode(
+            x=alt.X('pct:Q', sort=alt.SortField(metric_to_show_in_covid_Layer), stack='normalize', axis = None),
+            #detail = metric_to_show_in_covid_Layer,
+            color=alt.Color(metric_name +":O",
+                            scale=alt.Scale(range=['#000000','#000000'])
+                            ,legend = None),
+            text=alt.Text('pct:Q',format='.0%')
+        )
+        
+        legend_category = legend_info.mark_text(dx = 10, dy = 10, align='left', baseline='middle', color='black', angle = 90, fontWeight = "bold").encode(
+            x=alt.X('pct:Q', sort=alt.SortField(metric_to_show_in_covid_Layer), stack='normalize', axis = None),
+            #detail = metric_to_show_in_covid_Layer,
+            color=alt.Color(metric_name +":O",
+                            scale=alt.Scale(range=['#000000','#000000'])
+                            ,legend = None),
+            #text=alt.Text(metric_to_show_in_covid_Layer)
+            text=alt.Text("category:N")
+        )
+            
+        legend_chart = (legend_bar + legend_value + legend_category).properties(
+            width=700,
+            height=100,
+            title = metric_name
+        ).configure_title(align = "left"
+        ).configure_view(
+            strokeWidth=0
+        )
+        
+        
+        st.altair_chart(legend_chart)
         
     ##### Evolution of policy per selected countries    
         
@@ -167,10 +232,7 @@ def app():
             alt.Column("Year:O", title = "", spacing = 10),
             color=alt.Color("value:Q", 
                             scale=alt.Scale(domain=[1,4], range=['#ffe8dd','#ef4f4f']),
-                            legend=alt.Legend(title = metric_name, orient='bottom',
-                                              titleOrient = "left",
-                                              type = 'gradient',
-                                              offset = 30)),
+                            legend=None),
             tooltip=[
                 alt.Tooltip("Country:N", title="Country"),
                 alt.Tooltip(metric_to_show_in_covid_Layer, title=metric_name),
@@ -186,7 +248,10 @@ def app():
         ).configure_title(align = "center", anchor = "middle", dy = -10)
             
             
-        st.altair_chart(barchart_country)  
+        st.altair_chart(barchart_country)
+        
+        st.altair_chart(legend_chart)
+        
     
     ####### Scatterplot control policy vs deaths
     
@@ -319,7 +384,13 @@ def app():
             ).configure_title(align = "center", anchor = "middle", dy = -10))
 
 
-##app()
+                         
+                         
+                         
+#app()
+
+
+
    
   
     

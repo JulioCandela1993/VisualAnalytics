@@ -6,7 +6,7 @@ def app():
     st.title("Tobacco: a silent killer")
     
     st.markdown('''
-    The Tobacco epidemic is considered one of the biggest public health threats by the World Health Organization (WHO)
+    The Tobacco epidemic is considered one of the biggest public health threats by the World Health Organization (WHO). WHO estimates millions of deaths per year caused by the frequent use of Tobacco. But it also states that this problem is preventable and enforcing measures to reduce Tobacco consumption as a priority.
     ''')
     
     image = Image.open('img/smoking.jpg')

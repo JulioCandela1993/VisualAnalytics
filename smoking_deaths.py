@@ -103,7 +103,7 @@ def app():
 
 
     # Year selection
-    slider = st.slider('Select a period of time', int(str(minyear)), int(str(maxyear)), (1993, 2005))
+    slider = st.slider('Select a period of time', int(str(minyear)), int(str(maxyear)), (1994, 2004))
 
     # Area chart - Smoking deaths by ages
     base = alt.Chart(deaths, title='Smoking deaths by age').mark_bar().transform_filter(

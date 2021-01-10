@@ -32,6 +32,15 @@ def app():
 
     st.image(image, caption='',
           use_column_width=True)
+          
+          
+    st.header("Team Members")
+    
+    st.markdown('''
+      * Manh Hung Nguyen
+      * Emir Nurmatbekov
+      * Julio Candela
+    ''')
     
     st.header("Sources")
     

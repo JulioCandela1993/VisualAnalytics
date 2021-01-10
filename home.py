@@ -49,7 +49,5 @@ def app():
     st.markdown('''
     * Tobacco Epidemic: https://www.who.int/news-room/fact-sheets/detail/tobacco#:~:text=Tobacco%20kills%20more%20than%208,-%20and%20middle-income%20countries.
     * Tobacco Control: https://apps.who.int/gho/data/node.main.Tobacco?lang=en
+    * Smoking Deaths: http://ghdx.healthdata.org/gbd-results-tool
     ''')
-    
-    
-app()

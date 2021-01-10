@@ -2,8 +2,8 @@
 
 ### Dashboard details
 
-* **Online URL**: [URL](https://share.streamlit.io/juliocandela1993/visualanalytics/main.py)
-* **Github**: [URL](https://github.com/JulioCandela1993/VisualAnalytics)
+* **Online URL**: [Online Application](https://share.streamlit.io/juliocandela1993/visualanalytics/main.py)
+* **Github**: [Github Project](https://github.com/JulioCandela1993/VisualAnalytics)
 * **Team members**:
   * Manh Hung Nguyen
   * Emir Nurmatbekov

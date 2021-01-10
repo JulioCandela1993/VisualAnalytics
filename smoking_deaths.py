@@ -3,13 +3,9 @@ import streamlit as st
 import pandas as pd
 
 def app():
-    ##########################################################
-    #############       smoking_deaths.py        #############
-    ##########################################################
-    st.title("Tobacco: a silent killer")
-    # st.header("")
+    st.header("Why Tobacco is a deadly threat?")
     
-    @st.cache(allow_output_mutation=True)
+    @st.cache
     def load_data():
         deaths = pd.read_csv('data/smoking-deaths-by-age.csv',
                             header=0,
@@ -63,31 +59,27 @@ def app():
                                 'Air pollution',
                                 'Outdoor air pollution'])
 
+        # Drop columns with missing values and extremely low values
+        factors.drop(columns=['Vitamin A deficiency', 'High total cholesterol', 'Zinc deficiency', 'Child stunting', 'Discontinued breastfeeding',
+                                'Iron deficiency', 'Non-exclusive breastfeeding','Diet high in red meat', 'Unsafe sanitation', 
+                                'No access to handwashing facility','Household air pollution from solid fuels',], inplace=True)
+
         # Convert data from wide to long
         deaths = pd.melt(deaths, id_vars=['country', 'year'], value_vars=['15 to 49', '50 to 69', 'Above 70'], var_name='Age')
         factors = pd.melt(factors, id_vars=['country', 'year'], value_vars=['Diet low in vegetables',
                                 'Diet low in nuts and seeds',
                                 'Diet low in calcium',
                                 'Unsafe sex',
-                                'No access to handwashing facility',
                                 'Child wasting',
-                                'Child stunting',
-                                'Diet high in red meat',
                                 'Diet low in fiber',
                                 'Diet low in seafood omega-3 fatty acids',
                                 'Diet high in sodium',
                                 'Low physical activity',
-                                'Non-exclusive breastfeeding',
-                                'Discontinued breastfeeding',
-                                'Iron deficiency',
-                                'Vitamin A deficiency',
-                                'Zinc deficiency',
                                 'Smoking',
                                 'Secondhand smoke',
                                 'Alcohol use',
                                 'Drug use',
                                 'High fasting plasma glucose',
-                                'High total cholesterol', # Many null values
                                 'High systolic blood pressure',
                                 'High body-mass index',
                                 'Low bone mineral density',
@@ -95,8 +87,6 @@ def app():
                                 'Diet low in legumes',
                                 'Low birth weight for gestation',
                                 'Unsafe water source',
-                                'Unsafe sanitation',
-                                'Household air pollution from solid fuels',
                                 'Air pollution',
                                 'Outdoor air pollution'], var_name='risk_factor')
 
@@ -115,19 +105,6 @@ def app():
     # Year selection
     slider = st.slider('Select a period of time', int(str(minyear)), int(str(maxyear)), (1990, 2017))
 
-    # brush = alt.selection_interval(encodings=['x'])
-    # years = alt.Chart(deaths).mark_line().add_selection(
-    #     brush
-    # ).transform_filter(
-    #     alt.datum.country == selectCountry
-    # ).encode(
-    #     alt.X('year:O', title='Year'),
-    #     alt.Y('sum(value)', title='Smoking Deaths (all ages)')
-    # ).properties(
-    #     width=600,
-    #     height=150
-    # )
-
     # Area chart - Smoking deaths by ages
     base = alt.Chart(deaths, title='Smoking deaths by age').mark_bar().transform_filter(
         {'and': [{'field': 'country', 'equal': selectCountry},
@@ -135,7 +112,11 @@ def app():
     ).encode(
         alt.X('year:O', title='Year'),
         y=alt.Y('value:Q', title='Number of smoking deaths'),
-        color=alt.Color('Age:O', scale=alt.Scale(scheme='lightorange')),
+        order=alt.Order('value:Q', sort='ascending'),
+        color=alt.Color('Age:O',
+                        # sort = alt.EncodingSortField('Age', order = 'descending'), 
+                        scale = alt.Scale(domain=['Above 70', '50 to 69', '15 to 49'], scheme='lightorange')), 
+            # scale=alt.Scale(scheme='lightorange')),
         tooltip=alt.Tooltip(["value:Q"],format=",.0f",title="Deaths"),
         # alt.Tooltip(aggregate='sum', field="value", formatType="number"),
 
@@ -156,7 +137,7 @@ def app():
         rank='rank(sum_deaths)',
         sort=[alt.SortField('sum_deaths', order='descending')]
     ).transform_filter(
-        alt.datum.rank < 20
+        alt.datum.rank < 11
     ).encode(
         alt.X('sum_deaths:Q', title='Total deaths over the period of time'),
         y=alt.Y('risk_factor:O',sort='-x', title='Risk factor'),
@@ -168,7 +149,7 @@ def app():
         )
     ).properties(
         width=700,
-        height=350
+        height=250
     )
 
     container1 = st.beta_container()
@@ -179,16 +160,3 @@ def app():
     st.markdown("In the bar chart below, we can see how smoking ranks in the list of top 20 risk factors that lead to deaths in the chosen country in the chosen period of time.")
 
     st.altair_chart(bar_factors)
-    # Visualize
-    # st.altair_chart(alt.hconcat(alt.vconcat(base,years)
-    #                             .properties(spacing=20), bar_factors)
-    #                             .configure_legend(orient='top-left', strokeColor='gray',
-    #                                             fillColor='#EEEEEE',
-    #                                             padding=5,
-    #                                             cornerRadius=10)
-    #                             .properties(spacing=20, autosize="pad")
-    #                             .configure_title(
-    #                                             align="center",
-    #                                             fontSize=20,
-    #                                             font='Arial',
-    #                                             color='black')) 

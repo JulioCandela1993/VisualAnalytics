@@ -47,7 +47,7 @@ def app():
     ]
     
     
-    
+    # Main Selector of Control Measures
     cols = st.selectbox('Select control measure: ', control_metrics)
     
     if cols in control_metrics:   
@@ -60,6 +60,10 @@ def app():
         
         
     container_map = st.beta_container()
+    
+    
+    ####### Map Visualization
+    
     with container_map:
         
         st.header("How are countries controlling Tobacco consumption?")
@@ -70,15 +74,16 @@ def app():
         We can also see the evolution of these policies from 2008 to 2018
         ''')
         
+        # Year Selector
         select_year_list = st.selectbox('Select year: ', years)#st.slider('Select year: ', 2008, 2018, 2008, step = 2)
         select_year = int(select_year_list)
 
-        ####### Map Visualization
-        
-        
+        # Map Topology
         url_topojson = 'https://raw.githubusercontent.com/JulioCandela1993/VisualAnalytics/master/world-countries.json'
         data_topojson_remote = alt.topo_feature(url=url_topojson, feature='countries1')
         
+        
+        ### Map Chart
         
         map_geojson = alt.Chart(data_topojson_remote).mark_geoshape(
             stroke="black",
@@ -128,6 +133,7 @@ def app():
         )
     
     
+        st.altair_chart(map_geojson + choro)
             
         ## Qualification array
         
@@ -136,10 +142,10 @@ def app():
             "category":["1.Very Bad", "2.Bad", "3.Medium", "4.Good", "5.Perfect"]
             })
         
+        ## Legend Chart
         
-            
-        st.altair_chart(map_geojson + choro)
-        
+        ##### Data Transformations
+
         legend_info = alt.Chart(control_dataset).transform_joinaggregate(
             num_countries='count(*)',
         ).transform_filter(
@@ -211,6 +217,8 @@ def app():
         
         ''')
     
+    
+        ## Selector of countries
         
         countries = st.multiselect('Select countries to plot',
                                     control_df.groupby('Country').count().reset_index()['Country'].tolist(),
@@ -222,6 +230,8 @@ def app():
         ''') 
         
         xscale_barchart = alt.Scale(domain=(0, 5))
+        
+        ## Comparisson Chart of Policies per country
         
         barchart_country = alt.Chart(control_dataset,width=90,height=20,
                                      title = 'Evolution of Policy "' + metric_name + '" per selected countries'
@@ -304,6 +314,8 @@ def app():
     
         brush = alt.selection_interval()
         
+        ## Data Transformations
+        
         base_scatter = alt.Chart(control_dataset).transform_lookup(
                 lookup="ID",
                 from_=alt.LookupData(deaths_dataset, "ID", ["deaths","Year"])
@@ -332,7 +344,8 @@ def app():
         xscale = alt.Scale(domain=(-100, 300))
         yscale = alt.Scale(domain=(-100, 200))
         
-        # area_args = {'opacity': .3, 'interpolate': 'step'}
+        
+        ## Scatterplot of changes in Policy and changes in deaths
         
         points_scatter = base_scatter.mark_point(size=50, stroke="#ef4f4f").encode(
             alt.X('incr_ratio_metric:Q', scale = xscale, title = '% change of efforts in ' + metric_name + ' from 2008 to 2016'),
@@ -354,7 +367,9 @@ def app():
         ).mark_line(color='#19456b')
         
         scatter_final = (points_scatter + regression_scatter)
-            
+           
+        # Histogram of changes in policy
+        
         top_hist = base_scatter.mark_area(line=True, opacity=0.3).encode(
             alt.X("incr_ratio_metric:Q",
                   bin=alt.Bin(maxbins=30, extent=xscale.domain),
@@ -366,6 +381,8 @@ def app():
             brush
         ).properties(width=450 , height=100, title = "Distribution of % change in policy")
         
+        # Histogram of changes in deaths    
+            
         right_hist = base_scatter.mark_area(line=True, opacity=0.3).encode(
             alt.Y('incr_ratio_deaths:Q',
                   bin=alt.Bin(maxbins=20, extent=yscale.domain),

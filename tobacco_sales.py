@@ -140,7 +140,7 @@ def app():
         consumption_chart, consumption_selectors, consumption_points, consumption_rules, consumption_text
         )
         st.altair_chart(alt.vconcat(smokers_chart, consumption_chart))
-       st.markdown(
+       	st.markdown(
         '''
         Below, you can see how share of smokers and consumption of cigarettes changed over the years in different countries.
         The share of smokers chart shows the percentage of every-day-smoking adults, the consumption chart

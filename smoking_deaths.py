@@ -5,7 +5,7 @@ import pandas as pd
 def app():
     st.header("Why Tobacco is a deadly threat?")
     
-    @st.cache
+    @st.cache(allow_output_mutation=True)
     def load_data():
         deaths = pd.read_csv('data/smoking-deaths-by-age.csv',
                             header=0,
@@ -105,23 +105,6 @@ def app():
     # Year selection
     slider = st.slider('Select a period of time', int(str(minyear)), int(str(maxyear)), (1994, 2004))
 
-    # Area chart - Smoking deaths by ages
-    base = alt.Chart(deaths, title='Smoking deaths by age').mark_bar().transform_filter(
-        {'and': [{'field': 'country', 'equal': selectCountry},
-                {'field': 'year', 'range': slider}]}
-    ).encode(
-        alt.X('year:O', title='Year'),
-        y=alt.Y('value:Q', title='Number of smoking deaths'),
-        order=alt.Order('Age:O', sort='ascending'),
-        color=alt.Color('Age:O',
-                        scale = alt.Scale(domain=['Above 70', '50 to 69', '15 to 49'], scheme='lightorange')), 
-        tooltip=alt.Tooltip(["value:Q"],format=",.0f",title="Deaths"),
-        text='Age:O'
-    ).properties(
-        width=700,
-        height=300
-    )
-
     # Bar chart - Risk factors
     bar_factors = alt.Chart(factors, title='Ranking of the top 10 risk factors').mark_bar().transform_filter(
         {'and': [{'field': 'country', 'equal': selectCountry},
@@ -147,6 +130,25 @@ def app():
         width=620,
         height=300
     )
+    
+    # Area chart - Smoking deaths by ages
+    base = alt.Chart(deaths, title='Smoking deaths by age').mark_bar().transform_filter(
+        {'and': [{'field': 'country', 'equal': selectCountry},
+                {'field': 'year', 'range': slider}]}
+    ).encode(
+        alt.X('year:O', title='Year'),
+        y=alt.Y('value:Q', title='Number of smoking deaths'),
+        order=alt.Order('Age:O', sort='ascending'),
+        color=alt.Color('Age:O',
+                        scale = alt.Scale(domain=['Above 70', '50 to 69', '15 to 49'], scheme='lightorange')), 
+        tooltip=alt.Tooltip(["value:Q"],format=",.0f",title="Deaths"),
+        text='Age:O'
+    ).properties(
+        width=700,
+        height=300
+    )
+
+    
 
     container1 = st.beta_container()
     with container1:
@@ -155,4 +157,8 @@ def app():
     st.markdown("Smoking is a critical factor leading to deaths, especially for old people. The number of people aged over 70 who died because of smoking is extremely high in all countries.")
     st.markdown("In the bar chart below, we can see how smoking ranks in the list of top 20 risk factors that lead to deaths in the chosen country in the chosen period of time.")
 
-    st.altair_chart(bar_factors)
+    container2 = st.beta_container()
+    with container2:
+        st.altair_chart(bar_factors)
+
+    

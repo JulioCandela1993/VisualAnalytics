@@ -62,15 +62,18 @@ def app():
         # Drop columns with missing values and extremely low values
         factors.drop(columns=['Vitamin A deficiency', 'High total cholesterol', 'Zinc deficiency', 'Child stunting', 'Discontinued breastfeeding',
                                 'Iron deficiency', 'Non-exclusive breastfeeding','Diet high in red meat', 'Unsafe sanitation', 
-                                'No access to handwashing facility','Household air pollution from solid fuels',], inplace=True)
+                                'No access to handwashing facility','Household air pollution from solid fuels', 'Unsafe water source', 'Child wasting',
+                                'Low birth weight for gestation', 'Diet low in calcium', 'Low bone mineral density',], inplace=True)
+
+        # Filter data with years
+        factors = factors.drop(factors[factors.year > 2012].index)
+        deaths = deaths.drop(deaths[deaths.year > 2012].index)
 
         # Convert data from wide to long
         deaths = pd.melt(deaths, id_vars=['country', 'year'], value_vars=['15 to 49', '50 to 69', 'Above 70'], var_name='Age')
         factors = pd.melt(factors, id_vars=['country', 'year'], value_vars=['Diet low in vegetables',
                                 'Diet low in nuts and seeds',
-                                'Diet low in calcium',
                                 'Unsafe sex',
-                                'Child wasting',
                                 'Diet low in fiber',
                                 'Diet low in seafood omega-3 fatty acids',
                                 'Diet high in sodium',
@@ -82,11 +85,8 @@ def app():
                                 'High fasting plasma glucose',
                                 'High systolic blood pressure',
                                 'High body-mass index',
-                                'Low bone mineral density',
                                 'Diet low in fruits',
                                 'Diet low in legumes',
-                                'Low birth weight for gestation',
-                                'Unsafe water source',
                                 'Air pollution',
                                 'Outdoor air pollution'], var_name='risk_factor')
 
@@ -99,11 +99,11 @@ def app():
     deaths, factors, countries, minyear, maxyear = load_data()
 
     # Country Selection
-    selectCountry = st.selectbox('Select a country: ', countries, 73)
+    selectCountry = st.selectbox('Select a country: ', countries, 77)
 
 
     # Year selection
-    slider = st.slider('Select a period of time', int(str(minyear)), int(str(maxyear)), (1990, 2017))
+    slider = st.slider('Select a period of time', int(str(minyear)), int(str(maxyear)), (1994, 2004))
 
     # Area chart - Smoking deaths by ages
     base = alt.Chart(deaths, title='Smoking deaths by age').mark_bar().transform_filter(
@@ -112,22 +112,18 @@ def app():
     ).encode(
         alt.X('year:O', title='Year'),
         y=alt.Y('value:Q', title='Number of smoking deaths'),
-        order=alt.Order('value:Q', sort='ascending'),
+        order=alt.Order('Age:O', sort='ascending'),
         color=alt.Color('Age:O',
-                        # sort = alt.EncodingSortField('Age', order = 'descending'), 
                         scale = alt.Scale(domain=['Above 70', '50 to 69', '15 to 49'], scheme='lightorange')), 
-            # scale=alt.Scale(scheme='lightorange')),
         tooltip=alt.Tooltip(["value:Q"],format=",.0f",title="Deaths"),
-        # alt.Tooltip(aggregate='sum', field="value", formatType="number"),
-
         text='Age:O'
     ).properties(
-        width=780,
-        height=350
+        width=700,
+        height=300
     )
 
     # Bar chart - Risk factors
-    bar_factors = alt.Chart(factors, title='Ranking of the top 20 risk factors').mark_bar().transform_filter(
+    bar_factors = alt.Chart(factors, title='Ranking of the top 10 risk factors').mark_bar().transform_filter(
         {'and': [{'field': 'country', 'equal': selectCountry},
                 {'field': 'year', 'range': slider}]}
     ).transform_aggregate(
@@ -148,8 +144,8 @@ def app():
           alt.value("lightgray")  # Other than smoking
         )
     ).properties(
-        width=700,
-        height=250
+        width=620,
+        height=300
     )
 
     container1 = st.beta_container()

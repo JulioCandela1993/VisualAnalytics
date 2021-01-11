@@ -6,7 +6,7 @@ import streamlit as st
 
 PAGES = {
     "Homepage": home,
-    "Tobacco Sales": tobacco_sales,
+    "Tobacco Consumption": tobacco_sales,
     "Smoking Deaths": smoking_deaths,
     "Tobacco Control": tobacco_control,
 }

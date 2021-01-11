@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 
 def app():
+    st.title("Smoking Deaths")
     st.header("Why Tobacco is a deadly threat?")
     
     @st.cache(allow_output_mutation=True)
@@ -16,6 +17,7 @@ def app():
                                 '15 to 49',
                                 '50 to 69',
                                 'Above 70'])
+
         factors = pd.read_csv('data/number-of-deaths-by-risk-factor.csv',
                             header=0,
                             index_col=False,
@@ -46,7 +48,7 @@ def app():
                                 'Alcohol use',
                                 'Drug use',
                                 'High fasting plasma glucose',
-                                'High total cholesterol', # Many null values
+                                'High total cholesterol',
                                 'High systolic blood pressure',
                                 'High body-mass index',
                                 'Low bone mineral density',
@@ -96,45 +98,44 @@ def app():
         maxyear = deaths.loc[:, 'year'].max()
         return deaths, factors, countries, minyear, maxyear
 
+    # Load data
     deaths, factors, countries, minyear, maxyear = load_data()
 
     # Country Selection
     selectCountry = st.selectbox('Select a country: ', countries, 77)
 
-
     # Year selection
     slider = st.slider('Select a period of time', int(str(minyear)), int(str(maxyear)), (1994, 2004))
 
     # Bar chart - Risk factors
-    bar_factors = alt.Chart(factors, title='Ranking of the top 10 risk factors').mark_bar().transform_filter(
-        {'and': [{'field': 'country', 'equal': selectCountry},
-                {'field': 'year', 'range': slider}]}
+    bar_factors = alt.Chart(factors, title="Ranking of the top 10 risk factors leading to deaths in "
+                 + selectCountry + " from " + str(slider[0]) + " to " + str(slider[1])).mark_bar().transform_filter({'and': [{'field': 'country', 'equal': selectCountry},
+                                                                                                                            {'field': 'year', 'range': slider}]}
     ).transform_aggregate(
-        sum_deaths='sum(value)',
+        sum_deaths='sum(value)', # Calculate the total number of deaths
         groupby=["risk_factor"]
     ).transform_window(
         rank='rank(sum_deaths)',
         sort=[alt.SortField('sum_deaths', order='descending')]
     ).transform_filter(
-        alt.datum.rank < 11
+        alt.datum.rank < 11 # Filter out top 10 factors
     ).encode(
-        alt.X('sum_deaths:Q', title='Total deaths over the period of time'),
+        alt.X('sum_deaths:Q', title='Total number of deaths'),
         y=alt.Y('risk_factor:O',sort='-x', title='Risk factor'),
         tooltip=alt.Tooltip(["sum_deaths:Q"],format=",.0f",title="Deaths"),
         color=alt.condition(
           alt.datum['risk_factor'] == 'Smoking',
-          alt.value("red"),  # Smoking color
-          alt.value("lightgray")  # Other than smoking
+          alt.value("red"),  # Color for the smoking factor
+          alt.value("lightgray")  # Color for the rest
         )
     ).properties(
-        width=620,
+        width=660,
         height=300
     )
     
-    # Area chart - Smoking deaths by ages
-    base = alt.Chart(deaths, title='Smoking deaths by age').mark_bar().transform_filter(
-        {'and': [{'field': 'country', 'equal': selectCountry},
-                {'field': 'year', 'range': slider}]}
+    # Stacked bar chart - Smoking deaths by ages
+    base = alt.Chart(deaths, title='Smoking deaths by age in ' + selectCountry).mark_bar().transform_filter({'and': [{'field': 'country', 'equal': selectCountry},
+                                                                                                                    {'field': 'year', 'range': slider}]}
     ).encode(
         alt.X('year:O', title='Year'),
         y=alt.Y('value:Q', title='Number of smoking deaths'),
@@ -142,20 +143,19 @@ def app():
         color=alt.Color('Age:O',
                         scale = alt.Scale(domain=['Above 70', '50 to 69', '15 to 49'], scheme='lightorange')), 
         tooltip=alt.Tooltip(["value:Q"],format=",.0f",title="Deaths"),
-        text='Age:O'
     ).properties(
-        width=700,
+        width=720,
         height=300
     )
 
     
-
+    # Render the charts
     container1 = st.beta_container()
     with container1:
         st.altair_chart(base)
 
-    st.markdown("Smoking is a critical factor leading to deaths, especially for old people. The number of people aged over 70 who died because of smoking is extremely high in all countries.")
-    st.markdown("In the bar chart below, we can see how smoking ranks in the list of top 20 risk factors that lead to deaths in the chosen country in the chosen period of time.")
+    st.markdown("From the chart above we can see that smoking is a critical factor leading to deaths, especially for old people. The numbers of people aged over 70 who died because of smoking are extremely high in all countries. \
+                In the bar chart below, we can see how smoking ranks in the list of top 10 risk factors that lead to deaths in the chosen country in the chosen period of time.")
 
     container2 = st.beta_container()
     with container2:

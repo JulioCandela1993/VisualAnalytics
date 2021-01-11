@@ -13,7 +13,7 @@ def app():
     
     image = Image.open('img/smoking.jpg')
 
-    st.image(image, caption='',
+    st.image(image, caption='Image source: theconversation.com',
           use_column_width=True)
     
     st.header("Key facts")

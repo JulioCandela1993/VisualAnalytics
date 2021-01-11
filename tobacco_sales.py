@@ -41,8 +41,8 @@ def app():
     smokers_data, consumption_data = load_data(smokers_path, consumption_path)
     container = st.beta_container()
     with container:
-        st.header('Tobacco smokers trend in different countries')
-
+        # st.header('Tobacco smokers trend in different countries')
+        st.title("Tobacco consumption")
         countries = st.multiselect('Select countries to plot',
                             smokers_data.groupby('Country').count().reset_index()['Country'].tolist(),
                             default=['France', 'Germany', 'Spain'])
@@ -65,7 +65,7 @@ def app():
         slider = st.slider('Select a period to plot',
                         int(str(min_year)), 
                         int(str(max_year)),
-                        (int(str(min_year)), int(str(max_year))))
+                        (int(str(min_year)), 2010))
                         
     smokers_chart = alt.Chart(smokers_data, height=CHART_HEIGHT, width=CHART_WIDTH,
                             title='Share of adults who smoke every day(%)',
